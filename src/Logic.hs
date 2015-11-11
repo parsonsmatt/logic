@@ -106,7 +106,7 @@ true = Pure True
 false :: Functor f => Free f Bool
 false = Pure False
 
-type AndOr = AndF :+: OrF
+type AndOr = OrF :*: AndF
 
 testProgram :: (AndF :<: f) => Free f Bool
 testProgram = do
@@ -115,7 +115,7 @@ testProgram = do
   wat  <- pure asdf .&& pure hmmm
   return asdf
 
-test1 :: (AndF :<: f, OrF :<: f) => Free AndOr Bool
+test1 :: (AndF :<: f, OrF :<: f) => Free f Bool
 test1 = do
   asdf <- true .|| false
   wat <- pure asdf .&& false
