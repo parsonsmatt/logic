@@ -89,9 +89,6 @@ data AndF k = forall f. (AndF :<: f) => And (Free f Bool) (Free f Bool) (Bool ->
 instance Functor AndF where
   fmap f (And a b k) = And a b (f . k)
 
-(.&&) :: (AndF :<: f) => Free f Bool -> Free f Bool -> Free f Bool
-a .&& b = Free . inj $ And a b Pure
-
 data OrF k = forall f. (OrF :<: f) => Or (Free f Bool) (Free f Bool) (Bool -> k)
 
 instance Functor OrF where
@@ -100,13 +97,14 @@ instance Functor OrF where
 (.||) :: (OrF :<: f) => Free f Bool -> Free f Bool -> Free f Bool
 a .|| b = Free . inj $ Or a b Pure
 
+(.&&) :: (AndF :<: f) => Free f Bool -> Free f Bool -> Free f Bool
+a .&& b = Free . inj $ And a b Pure
+
 true :: Functor f => Free f Bool
 true = Pure True
 
 false :: Functor f => Free f Bool
 false = Pure False
-
-type AndOr = OrF :*: AndF
 
 testProgram :: (AndF :<: f) => Free f Bool
 testProgram = do
@@ -118,5 +116,5 @@ testProgram = do
 test1 :: (AndF :<: f, OrF :<: f) => Free f Bool
 test1 = do
   asdf <- true .|| false
-  wat <- pure asdf .&& false
+  wat <- pure asdf .&& false .&& true
   pure asdf .|| pure wat
